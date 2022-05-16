@@ -31,32 +31,43 @@ public class FilmorateApplicationTests {
 		User user2 = new User(2, "test2@ya.ru", "l2", "n2",
 				LocalDate.now().minusMonths(3));
 
+		//пробел в email
 		User user3 = new User(3, "test2@ ya.ru", "l2", "n2",
 				LocalDate.now().minusMonths(3));
+		//пустой логин
 		User user4 = new User(4, "test2@ya.ru", "", "n2",
 				LocalDate.now().minusMonths(3));
-		User user5 = new User(2, "test2@ya.ru", "", "n2",
-				LocalDate.now().minusMonths(3));
+
+		//дата рождения в будущем
+		User user5 = new User(2, "test2@ya.ru", "l5", "n2",
+				LocalDate.now().plusMonths(3));
 
 
 		Film film1 = new Film(1, "f1", "d1", LocalDate.now(), 240);
 		Film film2 = new Film(2, "f2", "f2", LocalDate.now(), 240);
 
+		//отрицательная продолжительность фильма
 		Film film3 = new Film(3, "f2", "f2", LocalDate.now(), -240);
+		//пустое описание
 		Film film4 = new Film(4, "f4", "", LocalDate.now(), 240);
-		Film film5 = new Film(1, "f1", "d1", LocalDate.now(), 240);
+		//пустое название фильма
+		Film film5 = new Film(1, "", "d1", LocalDate.now(), 240);
 
 		this.restTemplate.postForObject("http://localhost:" + port + "/users", user1, String.class);
 		this.restTemplate.postForObject("http://localhost:" + port + "/users", user2, String.class);
 		this.restTemplate.postForObject("http://localhost:" + port + "/users", user3, String.class);
 		this.restTemplate.postForObject("http://localhost:" + port + "/users", user4, String.class);
 		this.restTemplate.put("http://localhost:" + port + "/users", user5, String.class);
+		//пустой запрос
+		this.restTemplate.put("http://localhost:" + port + "/users", null, String.class);
 
 		this.restTemplate.postForObject("http://localhost:" + port + "/films", film1, String.class);
 		this.restTemplate.postForObject("http://localhost:" + port + "/films", film2, String.class);
 		this.restTemplate.postForObject("http://localhost:" + port + "/films", film3, String.class);
 		this.restTemplate.postForObject("http://localhost:" + port + "/films", film4, String.class);
 		this.restTemplate.put("http://localhost:" + port + "/films", film5, String.class);
+		//пустой запрос
+		this.restTemplate.put("http://localhost:" + port + "/films", null, String.class);
 
 		final List<User> users = this.restTemplate.getForObject(("http://localhost:" + port + "/users"),
 				ArrayList.class);

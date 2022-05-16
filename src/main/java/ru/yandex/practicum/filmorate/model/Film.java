@@ -14,9 +14,10 @@ public class Film {
     @NotBlank
     private final String name;
     @NotBlank
+    @Size(min = 1, max = 200)
     private final String description;
     @NotNull
-    LocalDate releaseDate;
+    private LocalDate releaseDate;
     @Positive
-    long duration;
+    private long duration;
 }
