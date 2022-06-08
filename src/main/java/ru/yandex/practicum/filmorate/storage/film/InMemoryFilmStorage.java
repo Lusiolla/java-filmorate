@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
-
 import lombok.Data;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exeption.FilmAlreadyExistException;
@@ -8,7 +7,6 @@ import ru.yandex.practicum.filmorate.exeption.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 @Data
@@ -27,11 +25,19 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public void update(Film film) throws RuntimeException {
+    public void update(Film film) {
         if (!films.containsKey(film.getId())) {
             throw new FilmNotFoundException();
         }
         films.put(film.getId(), film);
+    }
+
+    @Override
+    public void delete(long id) {
+        if (!films.containsKey(id)) {
+            throw new FilmNotFoundException();
+        }
+        films.remove(id);
     }
 
     @Override
@@ -42,23 +48,12 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
         return listFilms;
     }
-
     @Override
-    public Film findFilmById(long id) throws RuntimeException {
+    public Film findById(long id) {
         if (!films.containsKey(id)) {
             throw new FilmNotFoundException();
         }
         return films.get(id);
     }
 
-    @Override
-    public List<Film> getMostPopular(int count) {
-        if (count > films.size()) {
-            count = films.size();
-        }
-        return films.values().stream()
-                .sorted(Comparator.comparing(Film::getRate).reversed())
-                .limit(count)
-                .collect(Collectors.toList());
-    }
 }

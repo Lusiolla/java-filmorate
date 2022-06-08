@@ -14,55 +14,50 @@ public class UserService {
     private final UserStorage userStorage;
     private final FriendStorage friendStorage;
 
-    public void create(User newUser) throws RuntimeException {
-        userStorage.create(newUser);
+    public void delete(long id) {
+        userStorage.delete(id);
     }
 
-    public void update(User user) throws RuntimeException {
-        userStorage.update(user);
+    public void addFriend(long userId, long friendId) {
+        userStorage.findById(userId);
+        userStorage.findById(friendId);
+        friendStorage.add(userId, friendId);
     }
 
-    public List<User> findAll() {
-        return userStorage.findAll();
+    public void deleteFriend(long userId, long friendId) {
+        friendStorage.delete(userId, friendId);
     }
 
-    public User findUserById(long id) throws RuntimeException {
-        return userStorage.findUserById(id);
-    }
-
-    public void addFriend(long userId, long friendId) throws RuntimeException {
-        findUserById(userId);
-        findUserById(friendId);
-        friendStorage.addFriend(userId, friendId);
-    }
-
-    public void deleteFriend(long userId, long friendId) throws RuntimeException {
-        friendStorage.deleteFriend(userId, friendId);
-    }
-
-    public List<User> getFriends(long userId) throws RuntimeException {
-        findUserById(userId);
+    public List<User> getFriends(long userId) {
+        userStorage.findById(userId);
         List<User> friends = new ArrayList<>();
-        Collection<Long> friendsId = friendStorage.getFriends(userId);
-        if (!friendsId.isEmpty()) {
-            for (long id : friendsId) {
-                friends.add(findUserById(id));
+        Collection<Long> friendsId = friendStorage.findFriends(userId);
+        try {
+            if (!friendsId.isEmpty()) {
+                for (long id : friendsId) {
+                    friends.add(userStorage.findById(id));
+                }
             }
+        } catch (RuntimeException e) {
+            //ignore
         }
         return friends;
     }
 
-    public Collection<User> getMutualFriends(long userId, long otherId) throws RuntimeException {
-        findUserById(userId);
-        findUserById(otherId);
+    public Collection<User> getMutualFriends(long userId, long otherId) {
+        userStorage.findById(userId);
+        userStorage.findById(otherId);
         Set<User> friends = new HashSet<>();
         Set<Long> friendsId = friendStorage.getMutualFriends(userId, otherId);
-        if (!friendsId.isEmpty()) {
-            for (long id : friendsId) {
-                friends.add(findUserById(id));
+        try {
+            if (!friendsId.isEmpty()) {
+                for (long id : friendsId) {
+                    friends.add(userStorage.findById(id));
+                }
             }
+        } catch (RuntimeException e) {
+            //ignore
         }
         return friends;
     }
-
 }

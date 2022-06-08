@@ -11,7 +11,7 @@ public class InMemoryFriendStorage implements FriendStorage {
     private HashMap<Long, Set<Long>> friends = new HashMap<>();
 
     @Override
-    public void addFriend(long userId, long friendId) {
+    public void add(long userId, long friendId) {
         if (friends.containsKey(userId)) {
             friends.get(userId).add(friendId);
         } else {
@@ -30,7 +30,7 @@ public class InMemoryFriendStorage implements FriendStorage {
     }
 
     @Override
-    public void deleteFriend(long userId, long friendId) {
+    public void delete(long userId, long friendId) {
         if (!friends.containsKey(userId)) {
             throw new UserFriendNotFoundException();
         }
@@ -42,14 +42,14 @@ public class InMemoryFriendStorage implements FriendStorage {
     }
 
     @Override
-    public Set<Long> getFriends(long userId) {
+    public Set<Long> findFriends(long userId) {
         if (!friends.containsKey(userId)) {
             return new HashSet<>();
         } else {
             return friends.get(userId);
         }
     }
-
+    
     @Override
     public Set<Long> getMutualFriends(long userId, long otherId) {
         if (!friends.containsKey(userId) && !friends.containsKey(otherId)) {

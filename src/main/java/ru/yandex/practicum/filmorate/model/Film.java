@@ -21,5 +21,4 @@ public class Film {
     @Positive
     private final long duration;
     private int rate;
-
 }

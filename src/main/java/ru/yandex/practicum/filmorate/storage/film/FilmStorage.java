@@ -6,13 +6,13 @@ import java.util.List;
 
 public interface FilmStorage {
 
-    public void create(Film film) throws RuntimeException;
+    public void create(Film film);
 
-    public void update(Film film) throws RuntimeException;
+    public void update(Film film);
+
+    public void delete(long id);
 
     public List<Film> findAll();
 
-    public Film findFilmById(long id) throws RuntimeException;
-
-    public List<Film> getMostPopular(int count);
+    public Film findById(long id);
 }
