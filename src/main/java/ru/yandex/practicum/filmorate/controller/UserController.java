@@ -1,24 +1,30 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.sql.SQLException;
 import java.util.*;
 
 @RestController
 @Slf4j
 @RequestMapping("/users")
-@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
     private final UserStorage userStorage;
+
+    public UserController(UserService userService,
+                          @Qualifier("userDB") UserStorage userStorage) {
+        this.userService = userService;
+        this.userStorage = userStorage;
+    }
 
     @GetMapping
     public List<User> findAll() {
@@ -26,19 +32,22 @@ public class UserController {
     }
 
     @GetMapping("{id}")
-    public User findById(@PathVariable long id) {
-        return userStorage.findById(id);
+    public User findById(@PathVariable long id) throws SQLException {
+        User user = userStorage.findById(id);
+        log.info("Найден пользователь: {} {}", user.getId(),
+                user.getLogin());
+        return user;
     }
 
     @GetMapping("{id}/friends")
-    public List<User> getFriends(@PathVariable long id) {
+    public List<User> getFriends(@PathVariable long id) throws SQLException {
         List<User> f = userService.getFriends(id);
         log.debug("The user " + id + " has " + f.size() + " friend");
         return f;
     }
 
     @GetMapping("{id}/friends/common/{otherId}")
-    public Collection<User> getMutualFriends(@PathVariable long id, @PathVariable long otherId) {
+    public Collection<User> getMutualFriends(@PathVariable long id, @PathVariable long otherId) throws SQLException {
         Collection<User> f = userService.getMutualFriends(id, otherId);
         log.debug("Mutual friends: " + f.size());
         return f;
@@ -59,7 +68,7 @@ public class UserController {
     }
 
     @PutMapping("{id}/friends/{friendId}")
-    public Long addFriends(@PathVariable long id, @PathVariable long friendId) {
+    public Long addFriends(@PathVariable long id, @PathVariable long friendId) throws SQLException {
         userService.addFriend(id, friendId);
         log.debug("The user " + id + " and user " + friendId + " became friends");
         return id;
