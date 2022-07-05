@@ -1,11 +1,12 @@
-package ru.yandex.practicum.filmorate.storage.user;
+package ru.yandex.practicum.filmorate.storage.memory;
 
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exeption.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exeption.UserAlreadyExistException;
 import ru.yandex.practicum.filmorate.exeption.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.sql.SQLException;
 import java.util.*;
 
 @Component
@@ -57,4 +58,5 @@ public class InMemoryUserStorage implements UserStorage {
         }
         return users.get(id);
     }
+
 }

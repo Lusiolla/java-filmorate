@@ -1,24 +1,27 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.friend.FriendStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.storage.FriendStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.sql.SQLException;
 import java.util.*;
 
 @Service
-@RequiredArgsConstructor
+@Component
 public class UserService {
     private final UserStorage userStorage;
     private final FriendStorage friendStorage;
 
-    public void delete(long id) {
-        userStorage.delete(id);
+    public  UserService(@Qualifier("userDB") UserStorage userStorage,
+                       @Qualifier("friendDB") FriendStorage friendStorage) {
+        this.userStorage = userStorage;
+        this.friendStorage = friendStorage;
     }
-
-    public void addFriend(long userId, long friendId) {
+    public void addFriend(long userId, long friendId) throws SQLException {
         userStorage.findById(userId);
         userStorage.findById(friendId);
         friendStorage.add(userId, friendId);
@@ -28,7 +31,7 @@ public class UserService {
         friendStorage.delete(userId, friendId);
     }
 
-    public List<User> getFriends(long userId) {
+    public List<User> getFriends(long userId) throws SQLException {
         userStorage.findById(userId);
         List<User> friends = new ArrayList<>();
         Collection<Long> friendsId = friendStorage.findFriends(userId);
@@ -44,12 +47,12 @@ public class UserService {
         return friends;
     }
 
-    public Collection<User> getMutualFriends(long userId, long otherId) {
+    public Collection<User> getMutualFriends(long userId, long otherId) throws SQLException {
         userStorage.findById(userId);
         userStorage.findById(otherId);
         Set<User> friends = new HashSet<>();
-        Set<Long> friendsId = friendStorage.getMutualFriends(userId, otherId);
-        try {
+        Collection<Long> friendsId = friendStorage.getMutualFriends(userId, otherId);
+       try {
             if (!friendsId.isEmpty()) {
                 for (long id : friendsId) {
                     friends.add(userStorage.findById(id));

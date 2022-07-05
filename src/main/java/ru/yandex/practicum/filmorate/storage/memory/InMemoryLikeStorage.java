@@ -1,7 +1,9 @@
-package ru.yandex.practicum.filmorate.storage.like;
+package ru.yandex.practicum.filmorate.storage.memory;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exeption.FilmNotFoundException;
+import ru.yandex.practicum.filmorate.storage.LikeStorage;
 
 import java.util.*;
 
@@ -11,16 +13,15 @@ public class InMemoryLikeStorage implements LikeStorage {
     private Map<Long, Set<Long>> likes = new HashMap<>();
 
     @Override
-    public boolean like(long filmId, long userId) {
-        boolean presence = false;
+    public void like(long filmId, long userId) {
         if (likes.containsKey(filmId)) {
-            presence = likes.get(filmId).add(userId);
+            likes.get(filmId).add(userId);
         } else {
             Set<Long> l = new HashSet<>();
             l.add(userId);
             likes.put(filmId, l);
         }
-        return presence;
+
     }
 
     @Override

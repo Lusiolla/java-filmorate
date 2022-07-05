@@ -1,7 +1,9 @@
-package ru.yandex.practicum.filmorate.storage.friend;
+package ru.yandex.practicum.filmorate.storage.memory;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exeption.UserFriendNotFoundException;
+import ru.yandex.practicum.filmorate.storage.FriendStorage;
 
 import java.util.*;
 

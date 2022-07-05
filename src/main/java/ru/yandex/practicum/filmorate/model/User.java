@@ -4,11 +4,12 @@ import lombok.*;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
 public class User {
-    @NonNull
     private long id;
     @NotBlank
     @Email
@@ -27,5 +28,14 @@ public class User {
         } else {
             return name;
         }
+    }
+
+    public Map<String, Object> toMap() {
+        Map<String, Object> values = new HashMap<>();
+        values.put("email", email);
+        values.put("login", login);
+        values.put("username", getName());
+        values.put("birthday", birthday);
+        return values;
     }
 }
