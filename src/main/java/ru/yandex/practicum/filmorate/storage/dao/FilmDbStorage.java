@@ -7,7 +7,6 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exeption.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
@@ -21,6 +20,7 @@ import java.util.*;
 public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
+    private final GenreOfFilmDbStorage genre;
 
     private final static String FIND_BY_ID = "select " +
             "f.film_id, +" +
@@ -59,20 +59,6 @@ public class FilmDbStorage implements FilmStorage {
             "from films " +
             "where film_id = ?";
 
-    private final static String ADD_GENRE_OF_FILM = "insert " +
-            "into genre_of_film " +
-            "(genre_id, film_id) " +
-            "values (?, ?)";
-    private final static String DELETE_GENRE_OF_FILM = "delete " +
-            "from genre_of_film " +
-            "where film_id = ?";
-    private final static String FIND_GENRE = "select " +
-            "gf.genre_id, " +
-            "g.genre_name, " +
-            "from genres as g " +
-            "inner join genre_of_film as gf on g.genre_id = gf.genre_id " +
-            "where gf.film_id = ? " +
-            "order by gf.genre_id asc";
     private final static String GET_POPULAR = "select " +
             "f.film_id, " +
             "f.film_name, " +
@@ -94,7 +80,7 @@ public class FilmDbStorage implements FilmStorage {
                 .withTableName("films")
                 .usingGeneratedKeyColumns("film_id");
         film.setId(simpleJdbcInsert.executeAndReturnKey(film.toMap()).longValue());
-        setGenreOfFilm(film);
+        genre.setGenreOfFilm(film);
     }
 
     @Override
@@ -110,7 +96,7 @@ public class FilmDbStorage implements FilmStorage {
         if (answ) {
             throw new FilmNotFoundException("Что-то пошло не так. Не удалось обновить фильм " + film.getId());
         }
-        setGenreOfFilm(film);
+        genre.setGenreOfFilm(film);
         Film filmFromStorage = findById(film.getId());
         //тесты требуют, чтобы поле genres иногда возвращалось с нулевой ссылкой, иногда с пустым списокм
         if (film.getGenres() != null && film.getGenres().isEmpty()) {
@@ -148,12 +134,6 @@ public class FilmDbStorage implements FilmStorage {
 
     private Film makeFilm(ResultSet resultSet) throws SQLException {
         int filmId = resultSet.getInt("film_id");
-        Set<Genre> genres =  new HashSet<>(jdbcTemplate.query(FIND_GENRE,
-                (rs, rowNum) -> makeGenre(rs), filmId));
-        //тесты требуют поле иногда с нулевой ссылкой, иногда с пустым списокм
-        if (genres.isEmpty()) {
-            genres = null;
-        }
         return new Film(filmId,
                 resultSet.getString("film_name"),
                 resultSet.getString("description"),
@@ -161,22 +141,8 @@ public class FilmDbStorage implements FilmStorage {
                 resultSet.getLong("duration"),
                 resultSet.getInt("rate"),
                 new Mpa(resultSet.getInt("mpa_id"), resultSet.getString("mpa_name")),
-                genres
+                genre.findGenreByFilm(filmId)
         );
-    }
-
-    private Genre makeGenre(ResultSet rs) throws SQLException {
-        return new Genre(rs.getInt("genre_id"), rs.getString("genre_name"));
-    }
-
-    private void setGenreOfFilm(Film film) {
-        if (film.getGenres() == null) {
-            return;
-        }
-        jdbcTemplate.update(DELETE_GENRE_OF_FILM, film.getId());
-        for (Genre genre : film.getGenres()) {
-            jdbcTemplate.update(ADD_GENRE_OF_FILM, genre.getId(), film.getId());
-        }
     }
 }
 
