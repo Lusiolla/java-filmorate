@@ -34,3 +34,6 @@ build/
 
 ### MVN Binaries ###
 .mvn/
+
+### DB ###
+db/

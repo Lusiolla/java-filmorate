@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.sql.SQLException;
+
 @ControllerAdvice
 @Slf4j
 public class ErrorHandlingControllerAdvice extends ResponseEntityExceptionHandler {
@@ -53,12 +55,36 @@ public class ErrorHandlingControllerAdvice extends ResponseEntityExceptionHandle
         return new ResponseEntity<>(e, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(MpaNotFoundException.class)
+    @ResponseBody
+    protected ResponseEntity<Exception> handleMpaNotFoundException() {
+        Exception e = new Exception("The mpa was not found");
+        log.warn(e.getMessage());
+        return new ResponseEntity<>(e, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(GenreNotFoundException.class)
+    @ResponseBody
+    protected ResponseEntity<Exception> handleGenreNotFoundException() {
+        Exception e = new Exception("The genre was not found");
+        log.warn(e.getMessage());
+        return new ResponseEntity<>(e, HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(UserFriendNotFoundException.class)
     @ResponseBody
     protected ResponseEntity<Exception> handleUserFriendNotFoundException() {
         Exception e = new Exception("The user's friend was not found");
         log.warn(e.getMessage());
         return new ResponseEntity<>(e, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(SQLException.class)
+    @ResponseBody
+    protected ResponseEntity<Exception> handleSQLException() {
+        Exception e = new Exception("SQLException");
+        log.warn(e.getMessage());
+        return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Data
