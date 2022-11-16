@@ -1,3 +1,6 @@
-# java-filmorate
-Template repository for Filmorate project.
-![This is diagram](/filmograma/document.pdf)
+Filmorate — бэкенд для сервиса, который работает с фильмами и оценками пользователей,
+а также возвращает топ-10 фильмов, рекомендованных к просмотру.
+
+Стек: Java(11), Maven, Spring Boot, H2 Database
+
+
